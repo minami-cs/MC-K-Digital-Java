@@ -26,10 +26,10 @@ public class JDBCConnect {
 			e.printStackTrace();
 		} finally {
 			try {
-				// 각각 다 닫아줘야 한다
-				if(conn!=null) conn.close();
+				// 각각 다 닫아줘야 한다. 순서는 열었던 것과 반대				
+				if(rset!=null) conn.close();				
 				if(stmt!=null) conn.close();
-				if(rset!=null) conn.close();
+				if(conn!=null) conn.close();				
 			} catch(SQLException e) {
 				e.printStackTrace();
 			}

@@ -8,8 +8,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import dto.Account;
-import dto.SpecialAccount;
+import Exp.AccountException;
+import Exp.BankExpCode;
+import acc.Account;
+import acc.SpecialAccount;
 
 public class AccountDAO {
 	Connection conn;
@@ -185,40 +187,29 @@ public class AccountDAO {
 		return accs;
 	}
 	// 반드시 DAO에 넣어둘 필요는 없음. bank의 account에서 써도 괜찮음.
-	public boolean depositAccount(String id, int money) {
+	public boolean depositAccount(String id, int money) throws AccountException {
 		Account acc = queryAccount(id);
 		if(acc==null) {
-			System.out.println("계좌번호가 틀립니다.");
-			return false;
+			throw new AccountException(BankExpCode.NOT_ACC);
 		}
-		boolean success = acc.deposit(money);
-		if(success==false) {
-			System.out.println("입금액이 틀립니다.");
-			return false;
-		}
+		acc.deposit(money);
 		int rcnt=updateAccount(acc);
 		if(rcnt>0) return true;
-		else return false;
+		return false;
 	}
-	public boolean withdrawAccount(String id, int money) {
+	public boolean withdrawAccount(String id, int money) throws AccountException {
 		//계좌 조회
 		Account acc = queryAccount(id);
 		//계좌번호 오류 체크
 		if(acc==null) {
-			System.out.println("계좌번호가 틀립니다.");
-			return false;
+			throw new AccountException(BankExpCode.NOT_ACC);
 		}
 		//계좌 객체에 출금 호출
-		boolean success = acc.withdrawal(money);
-		//잔액부족 체크
-		if(success==false) {
-			System.out.println("잔액이 부족합니다.");
-			return false;
-		}
+		acc.withdrawal(money);
 		//출금한 금액으로 db변경
 		int rcnt=updateAccount(acc);
 		if(rcnt>0) return true;
-		else return false;
+		return false;
 	}
 	public int updateAccount(Account acc) {
 		String sql = "update account set balance=? where id=?";
@@ -241,30 +232,31 @@ public class AccountDAO {
 		return rcnt;
 	}
 	//계좌이체는 자동커밋하지 않도록 해서 중간에 문제가 생기면 rollback, 정상적으로 모두 처리가 되면 commit되도록 해야 한다.
-	public boolean transferAccount(String sid, String rid, int money) {
-		try {
-			conn.setAutoCommit(false);
-			boolean success = withdrawAccount(sid,money);
-			if(success==false) {
-				conn.rollback();
-				return false;
-			}
-			success = depositAccount(rid,money);
-			if(success==false) {
-				conn.rollback();
-				return false;
-			}
-			conn.commit();
-		} catch(SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				//계좌이체 성공 시 오토커밋
-				conn.setAutoCommit(true);
-			} catch(SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		return true;
-	}
+//	public boolean transferAccount(String sid, String rid, int money) {
+//		try {
+//			conn.setAutoCommit(false);
+//			boolean success = withdrawAccount(sid,money);
+//			if(success==false) {
+//				conn.rollback();
+//				return false;
+//			}
+//			success = depositAccount(rid,money);
+//			if(success==false) {
+//				conn.rollback();
+//				return false;
+//			}
+//			conn.commit();
+//		} catch(SQLException e) {
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				//계좌이체 성공 시 오토커밋
+//				conn.setAutoCommit(true);
+//			} catch(SQLException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		return true;
+//	}
 }
+
