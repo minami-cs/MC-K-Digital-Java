@@ -36,5 +36,9 @@ public class StudentDTO {
 	public void setTel(String tel) {
 		this.tel = tel;
 	}
+	@Override
+	public String toString() {
+		return no+" "+name+" "+det+" "+addr+" "+tel;
+	}
 	
 }
