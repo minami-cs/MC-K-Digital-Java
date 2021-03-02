@@ -1,4 +1,4 @@
-package Pracice5;
+package Practice5;
 
 public class AnonymousExample {
 

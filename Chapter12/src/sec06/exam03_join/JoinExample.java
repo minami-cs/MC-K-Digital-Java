@@ -6,7 +6,7 @@ public class JoinExample {
 		SumThread sumThread = new SumThread();
 		sumThread.start();
 		try {
-			sumThread.join();  // sumThread가 끝날 때까지 기다리지 말라는 뜻
+			sumThread.join();  // sumThread가 끝날 때까지 기다리라는 뜻
 		} catch(InterruptedException e) {}
 		
 		System.out.println("1-100 합: " + sumThread.getSum());
